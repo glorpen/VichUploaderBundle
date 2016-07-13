@@ -24,6 +24,7 @@ class VichUploaderExtension extends Extension
         'orm' => 'doctrine.event_subscriber',
         'mongodb' => 'doctrine_mongodb.odm.event_subscriber',
         'phpcr' => 'doctrine_phpcr.event_subscriber',
+        'propel_ge' => 'propel.event',
     ];
 
     public function load(array $configs, ContainerBuilder $container): void

@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class Configuration implements ConfigurationInterface
 {
-    protected $supportedDbDrivers = ['orm', 'mongodb', 'propel', 'phpcr'];
+    protected $supportedDbDrivers = ['orm', 'mongodb', 'propel', 'phpcr', 'propel_ge'];
 
     protected $supportedStorages = ['gaufrette', 'flysystem', 'file_system'];
 

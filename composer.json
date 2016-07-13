@@ -65,7 +65,8 @@
         "oneup/flysystem-bundle": "For integration with Flysystem",
         "symfony/asset": "To generate better links",
         "symfony/yaml": "To use YAML mapping",
-        "willdurand/propel-eventdispatcher-bundle": "For integration with Propel"
+        "willdurand/propel-eventdispatcher-bundle": "For integration with Propel",
+        "glorpen/propel-bundle": "For integration with Propel Events"
     },
     "config": {
         "platform": {

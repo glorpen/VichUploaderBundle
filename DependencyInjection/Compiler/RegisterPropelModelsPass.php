@@ -13,6 +13,16 @@ use Vich\UploaderBundle\Exception\MappingNotFoundException;
  */
 class RegisterPropelModelsPass implements CompilerPassInterface
 {
+    protected function isDriverUsed($driver, array $mappings)
+    {
+        foreach ($mappings as $mapping) {
+            if($mapping['db_driver'] === $driver){
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * {@inheritdoc}
      */
