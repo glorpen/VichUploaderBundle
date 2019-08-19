@@ -26,7 +26,7 @@ class RegisterPropelModelsPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container): void
+    public function process(ContainerBuilder $container)
     {
         if (!$container->hasParameter('vich_uploader.mappings')) {
             return;

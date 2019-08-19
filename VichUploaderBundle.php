@@ -16,7 +16,7 @@ class VichUploaderBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container): void
+    public function build(ContainerBuilder $container)
     {
         parent::build($container);
 

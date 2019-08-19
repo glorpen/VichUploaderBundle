@@ -5,6 +5,7 @@ namespace Vich\UploaderBundle\DependencyInjection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -27,7 +28,7 @@ class VichUploaderExtension extends Extension
         'propel_ge' => 'propel.event',
     ];
 
-    public function load(array $configs, ContainerBuilder $container): void
+    public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -55,7 +56,7 @@ class VichUploaderExtension extends Extension
         $this->registerFormTheme($container);
     }
 
-    protected function loadServicesFiles(ContainerBuilder $container, array $config): void
+    protected function loadServicesFiles(ContainerBuilder $container, array $config)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
@@ -83,7 +84,7 @@ class VichUploaderExtension extends Extension
         }
     }
 
-    protected function registerMetadataDirectories(ContainerBuilder $container, array $config): void
+    protected function registerMetadataDirectories(ContainerBuilder $container, array $config)
     {
         $bundles = $container->getParameter('kernel.bundles');
 
@@ -125,7 +126,7 @@ class VichUploaderExtension extends Extension
         ;
     }
 
-    protected function registerCacheStrategy(ContainerBuilder $container, array $config): void
+    protected function registerCacheStrategy(ContainerBuilder $container, array $config)
     {
         if ('none' === $config['metadata']['cache']) {
             $container->removeAlias('vich_uploader.metadata.cache');
@@ -154,7 +155,7 @@ class VichUploaderExtension extends Extension
         return $config;
     }
 
-    protected function registerListeners(ContainerBuilder $container, array $config): void
+    protected function registerListeners(ContainerBuilder $container, array $config)
     {
         $servicesMap = [
             'inject_on_load' => ['name' => 'inject', 'priority' => 0],
@@ -192,9 +193,10 @@ class VichUploaderExtension extends Extension
 
     protected function createNamerService(ContainerBuilder $container, string $mappingName, array $mapping): array
     {
+        $definitionClassname = $this->getDefinitionClassname();
         $serviceId = \sprintf('%s.%s', $mapping['namer']['service'], $mappingName);
         $container->setDefinition(
-            $serviceId, new ChildDefinition($mapping['namer']['service'])
+            $serviceId, new $definitionClassname($mapping['namer']['service'])
         );
 
         $mapping['namer']['service'] = $serviceId;
@@ -208,9 +210,10 @@ class VichUploaderExtension extends Extension
         string $type,
         string $driver,
         int $priority = 0
-    ): void {
+    ) {
+        $definitionClassname = $this->getDefinitionClassname();
         $definition = $container
-            ->setDefinition(\sprintf('vich_uploader.listener.%s.%s', $type, $name), new ChildDefinition(\sprintf('vich_uploader.listener.%s.%s', $type, $driver)))
+            ->setDefinition(\sprintf('vich_uploader.listener.%s.%s', $type, $name), new $definitionClassname(\sprintf('vich_uploader.listener.%s.%s', $type, $driver)))
             ->replaceArgument(0, $name)
             ->replaceArgument(1, new Reference('vich_uploader.adapter.'.$driver));
 
@@ -220,12 +223,17 @@ class VichUploaderExtension extends Extension
         }
     }
 
-    private function registerFormTheme(ContainerBuilder $container): void
+    private function registerFormTheme(ContainerBuilder $container)
     {
         $resources = $container->hasParameter('twig.form.resources') ?
             $container->getParameter('twig.form.resources') : [];
 
         \array_unshift($resources, '@VichUploader/Form/fields.html.twig');
         $container->setParameter('twig.form.resources', $resources);
+    }
+
+    private function getDefinitionClassname(): string
+    {
+        return class_exists(ChildDefinition::class) ? ChildDefinition::class : DefinitionDecorator::class;
     }
 }

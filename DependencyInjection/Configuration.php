@@ -33,7 +33,7 @@ class Configuration implements ConfigurationInterface
         return $builder;
     }
 
-    protected function addGeneralSection(ArrayNodeDefinition $node): void
+    protected function addGeneralSection(ArrayNodeDefinition $node)
     {
         $node
             ->children()
@@ -69,7 +69,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    protected function addMetadataSection(ArrayNodeDefinition $node): void
+    protected function addMetadataSection(ArrayNodeDefinition $node)
     {
         $node
             ->children()
@@ -98,7 +98,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    protected function addMappingsSection(ArrayNodeDefinition $node): void
+    protected function addMappingsSection(ArrayNodeDefinition $node)
     {
         $node
             ->children()
