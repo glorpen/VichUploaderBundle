@@ -17,7 +17,8 @@ class UploadHandlerTest extends TestCase
     protected $storage;
     protected $injector;
     protected $dispatcher;
-
+    protected $mapping;
+    protected $object;
     protected $handler;
 
     const FILE_FIELD = 'file_field';
@@ -64,7 +65,7 @@ class UploadHandlerTest extends TestCase
 
     /**
      * @dataProvider methodProvider
-     * @expectedException Vich\UploaderBundle\Exception\MappingNotFoundException
+     * @expectedException \Vich\UploaderBundle\Exception\MappingNotFoundException
      */
     public function testAnExceptionIsThrownIfMappingIsntFound($method)
     {
@@ -201,30 +202,6 @@ class UploadHandlerTest extends TestCase
     protected function getDispatcherMock()
     {
         return $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-    }
-
-    /**
-     * Creates a mock property mapping factory
-     *
-     * @return \Vich\UploaderBundle\Mapping\PropertyMappingFactory
-     */
-    protected function getPropertyMappingFactoryMock()
-    {
-        return $this->getMockBuilder('Vich\UploaderBundle\Mapping\PropertyMappingFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * Gets a mock property mapping.
-     *
-     * @return \Vich\UploaderBundle\Mapping\PropertyMapping
-     */
-    protected function getPropertyMappingMock()
-    {
-        return $this->getMockBuilder('Vich\UploaderBundle\Mapping\PropertyMapping')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 
     protected function validEvent()

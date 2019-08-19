@@ -53,7 +53,7 @@ class PropertyNamerTest extends TestCase
     }
 
     /**
-     * @expectedException Vich\UploaderBundle\Exception\NameGenerationException
+     * @expectedException \Vich\UploaderBundle\Exception\NameGenerationException
      */
     public function testNameFailsIfThePropertyDoesNotExist()
     {
@@ -67,7 +67,7 @@ class PropertyNamerTest extends TestCase
     }
 
     /**
-     * @expectedException Vich\UploaderBundle\Exception\NameGenerationException
+     * @expectedException \Vich\UploaderBundle\Exception\NameGenerationException
      */
     public function testNameFailsIfThePropertyIsEmpty()
     {
@@ -80,7 +80,7 @@ class PropertyNamerTest extends TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      * @expectedExceptionMessage The property to use can not be determined. Did you call the configure() method?
      */
     public function testNamerNeedsToBeConfigured()
@@ -92,7 +92,7 @@ class PropertyNamerTest extends TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      * @expectedExceptionMessage Option "property" is missing or empty.
      */
     public function testConfigurationFailsIfThePropertyIsntSpecified()
@@ -100,15 +100,5 @@ class PropertyNamerTest extends TestCase
         $namer = new PropertyNamer();
 
         $namer->configure(array('incorrect' => 'options'));
-    }
-
-    /**
-     * @return \Vich\UploaderBundle\Mapping\PropertyMapping
-     */
-    private function getPropertyMappingMock()
-    {
-        return $this->getMockBuilder('Vich\UploaderBundle\Mapping\PropertyMapping')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

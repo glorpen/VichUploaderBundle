@@ -3,8 +3,12 @@
 namespace Vich\UploaderBundle\Tests\Storage;
 
 use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 use Symfony\Component\HttpFoundation\File\File;
 
+use Vich\UploaderBundle\Mapping\PropertyMapping;
+use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
+use Vich\UploaderBundle\Storage\StorageInterface;
 use Vich\UploaderBundle\Tests\DummyEntity;
 use Vich\UploaderBundle\Tests\TestCase;
 
@@ -16,17 +20,17 @@ use Vich\UploaderBundle\Tests\TestCase;
 abstract class StorageTestCase extends TestCase
 {
     /**
-     * @var \Vich\UploaderBundle\Mapping\PropertyMappingFactory $factory
+     * @var PropertyMappingFactory $factory
      */
     protected $factory;
 
     /**
-     * @var \Vich\UploaderBundle\Mapping\PropertyMapping
+     * @var PropertyMapping
      */
     protected $mapping;
 
     /**
-     * @var \Vich\UploaderBundle\Tests\DummyEntity
+     * @var DummyEntity
      */
     protected $object;
 
@@ -36,7 +40,7 @@ abstract class StorageTestCase extends TestCase
     protected $storage;
 
     /**
-     * @var \org\bovigo\vfs\vfsStreamDirectory
+     * @var vfsStreamDirectory
      */
     protected $root;
 
@@ -52,8 +56,8 @@ abstract class StorageTestCase extends TestCase
      */
     public function setUp()
     {
-        $this->factory = $this->getFactoryMock();
-        $this->mapping = $this->getMappingMock();
+        $this->factory = $this->getPropertyMappingFactoryMock();
+        $this->mapping = $this->getPropertyMappingMock();
         $this->object = new DummyEntity();
         $this->storage = $this->getStorage();
 
@@ -129,30 +133,6 @@ abstract class StorageTestCase extends TestCase
             ->will($this->returnValue($this->mapping));
 
         $this->assertNull($this->storage->resolvePath($this->object, 'file_field'));
-    }
-
-    /**
-     * Creates a mock factory.
-     *
-     * @return \Vich\UploaderBundle\Mapping\PropertyMappingFactory The factory.
-     */
-    protected function getFactoryMock()
-    {
-        return $this->getMockBuilder('Vich\UploaderBundle\Mapping\PropertyMappingFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * Creates a mapping mock.
-     *
-     * @return \Vich\UploaderBundle\Mapping\PropertyMapping The property mapping.
-     */
-    protected function getMappingMock()
-    {
-        return $this->getMockBuilder('Vich\UploaderBundle\Mapping\PropertyMapping')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 
     protected function getValidUploadDir()

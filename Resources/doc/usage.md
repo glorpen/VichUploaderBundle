@@ -32,14 +32,14 @@ vich_uploader:
     mappings:
         product_image:
             uri_prefix:         /images/products
-            upload_destination: %kernel.root_dir%/../web/images/products
+            upload_destination: '%kernel.root_dir%/../web/images/products'
 ```
 
 This is the minimal amount of configuration needed in order to describe a
 working mapping.
 
 **Note:**
-> The default behaviour is using the orginal name of uploaded file and can
+> The default behaviour is using the original name of uploaded file and can
 > override an old file with the same name. Please user a [namer](namers.md)
 > like `vich_uploader.namer_property` to avoid this issue.
 
@@ -143,14 +143,14 @@ class Product
         if ($image) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTime('now');
+            $this->updatedAt = new \DateTimeImmutable();
         }
         
         return $this;
     }
 
     /**
-     * @return File
+     * @return File|null
      */
     public function getImageFile()
     {
@@ -170,7 +170,7 @@ class Product
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getImageName()
     {
