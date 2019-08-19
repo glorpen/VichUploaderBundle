@@ -12,9 +12,9 @@ use Vich\UploaderBundle\EventListener\Propel\CleanListener;
 class CleanListenerTest extends ListenerTestCase
 {
     /**
-     * Sets up the test
+     * Sets up the test.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,14 +24,14 @@ class CleanListenerTest extends ListenerTestCase
     /**
      * Test the getSubscribedEvents method.
      */
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = $this->listener->getSubscribedEvents();
 
         $this->assertArrayHasKey('propel.pre_update', $events);
     }
 
-    public function testOnUpload()
+    public function testOnUpload(): void
     {
         $this->handler
             ->expects($this->once())

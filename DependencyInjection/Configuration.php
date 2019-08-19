@@ -5,6 +5,7 @@ namespace Vich\UploaderBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Configuration.
@@ -13,27 +14,26 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    protected $supportedDbDrivers = array('orm', 'mongodb', 'propel', 'propel_ge', 'phpcr');
-    protected $supportedStorages = array('gaufrette', 'flysystem', 'file_system');
+    protected $supportedDbDrivers = ['orm', 'mongodb', 'propel', 'phpcr', 'propel_ge'];
 
-    /**
-     * Gets the configuration tree builder for the extension.
-     *
-     * @return Tree The configuration tree builder
-     */
-    public function getConfigTreeBuilder()
+    protected $supportedStorages = ['gaufrette', 'flysystem', 'file_system'];
+
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $tb = new TreeBuilder();
-        $root = $tb->root('vich_uploader');
-
+        if (Kernel::VERSION_ID >= 40200) {
+            $builder = new TreeBuilder('vich_uploader');
+        } else {
+            $builder = new TreeBuilder();
+        }
+        $root = \method_exists($builder, 'getRootNode') ? $builder->getRootNode() : $builder->root('vich_uploader');
         $this->addGeneralSection($root);
         $this->addMetadataSection($root);
         $this->addMappingsSection($root);
 
-        return $tb;
+        return $builder;
     }
 
-    protected function addGeneralSection(ArrayNodeDefinition $node)
+    protected function addGeneralSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
@@ -44,32 +44,32 @@ class Configuration implements ConfigurationInterface
                     ->isRequired()
                     ->beforeNormalization()
                         ->ifString()
-                        ->then(function ($v) { return strtolower($v); })
+                        ->then(function ($v) {
+                            return \strtolower($v);
+                        })
                     ->end()
                     ->validate()
                         ->ifNotInArray($this->supportedDbDrivers)
-                        ->thenInvalid('The db driver %s is not supported. Please choose one of ' . implode(', ', $this->supportedDbDrivers))
+                        ->thenInvalid('The db driver %s is not supported. Please choose one of '.\implode(', ', $this->supportedDbDrivers))
                     ->end()
                 ->end()
                 ->scalarNode('storage')
                     ->defaultValue('file_system')
-                    ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) { return strtolower($v); })
-                    ->end()
                     ->validate()
                         ->ifTrue(function ($storage) {
-                            return strpos($storage, '@') !== 0 && !in_array($storage, $this->supportedStorages, true);
+                            return 0 !== \strpos($storage, '@') && !\in_array($storage, $this->supportedStorages, true);
                         })
-                        ->thenInvalid('The storage %s is not supported. Please choose one of ' . implode(', ', $this->supportedStorages) . ' or provide a service name prefixed with "@".')
+                        ->thenInvalid('The storage %s is not supported. Please choose one of '.\implode(', ', $this->supportedStorages).' or provide a service name prefixed with "@".')
                     ->end()
                 ->end()
-                ->scalarNode('twig')->defaultTrue()->end()
+            ->scalarNode('templating')->defaultTrue()->end()
+            ->scalarNode('twig')->defaultTrue()->info('twig requires templating')->end()
+            ->scalarNode('form')->defaultTrue()->end()
             ->end()
         ;
     }
 
-    protected function addMetadataSection(ArrayNodeDefinition $node)
+    protected function addMetadataSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
@@ -98,7 +98,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    protected function addMappingsSection(ArrayNodeDefinition $node)
+    protected function addMappingsSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
@@ -112,14 +112,28 @@ class Configuration implements ConfigurationInterface
                                 ->addDefaultsIfNotSet()
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then(function ($v) { return array('service' => $v, 'options' => array()); })
+                                    ->then(function ($v) {
+                                        return ['service' => $v, 'options' => []];
+                                    })
                                 ->end()
                                 ->children()
                                 ->scalarNode('service')->defaultNull()->end()
                                 ->variableNode('options')->defaultNull()->end()
                                 ->end()
                             ->end()
-                            ->scalarNode('directory_namer')->defaultNull()->end()
+                            ->arrayNode('directory_namer')
+                                ->addDefaultsIfNotSet()
+                                ->beforeNormalization()
+                                    ->ifString()
+                                    ->then(function ($v) {
+                                        return ['service' => $v, 'options' => []];
+                                    })
+                                ->end()
+                                ->children()
+                                ->scalarNode('service')->defaultNull()->end()
+                                ->variableNode('options')->defaultNull()->end()
+                                ->end()
+                            ->end()
                             ->scalarNode('delete_on_remove')->defaultTrue()->end()
                             ->scalarNode('delete_on_update')->defaultTrue()->end()
                             ->scalarNode('inject_on_load')->defaultFalse()->end()
@@ -127,11 +141,13 @@ class Configuration implements ConfigurationInterface
                                 ->defaultNull()
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then(function ($v) { return strtolower($v); })
+                                    ->then(function ($v) {
+                                        return \strtolower($v);
+                                    })
                                 ->end()
                                 ->validate()
                                     ->ifNotInArray($this->supportedDbDrivers)
-                                    ->thenInvalid('The db driver %s is not supported. Please choose one of ' . implode(', ', $this->supportedDbDrivers))
+                                    ->thenInvalid('The db driver %s is not supported. Please choose one of '.\implode(', ', $this->supportedDbDrivers))
                                 ->end()
                             ->end()
                         ->end()

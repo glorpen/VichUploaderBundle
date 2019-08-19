@@ -2,6 +2,7 @@
 
 namespace Vich\UploaderBundle\Tests\Mapping\Annotation;
 
+use PHPUnit\Framework\TestCase;
 use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
 
 /**
@@ -9,15 +10,14 @@ use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
  *
  * @author Dustin Dobervich <ddobervich@gmail.com>
  */
-class UploadableFieldTest extends \PHPUnit_Framework_TestCase
+class UploadableFieldTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testExceptionThrownWhenNoMappingAttribute()
+    public function testExceptionThrownWhenNoMappingAttribute(): void
     {
-        new UploadableField(array(
-            'fileNameProperty' => 'fileName'
-        ));
+        $this->expectException(\InvalidArgumentException::class);
+
+        new UploadableField([
+            'fileNameProperty' => 'fileName',
+        ]);
     }
 }

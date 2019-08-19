@@ -4,13 +4,12 @@ namespace Vich\UploaderBundle\Naming;
 
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Vich\UploaderBundle\Exception\NameGenerationException;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Vich\UploaderBundle\Util\Transliterator;
 
 /**
- * PropertyNamer
+ * PropertyNamer.
  *
  * @author Kévin Gomez <contact@kevingomez.fr>
  */
@@ -30,10 +29,12 @@ class PropertyNamer implements NamerInterface, ConfigurableInterface
 
     /**
      * @param array $options Options for this namer. The following options are accepted:
-     *                         - property: path to the property used to name the file. Can be either an attribute or a method.
-     *                         - transliterate: whether the filename should be transliterated or not.
+     *                       - property: path to the property used to name the file. Can be either an attribute or a method.
+     *                       - transliterate: whether the filename should be transliterated or not
+     *
+     * @throws \InvalidArgumentException
      */
-    public function configure(array $options)
+    public function configure(array $options): void
     {
         if (empty($options['property'])) {
             throw new \InvalidArgumentException('Option "property" is missing or empty.');
@@ -43,10 +44,7 @@ class PropertyNamer implements NamerInterface, ConfigurableInterface
         $this->transliterate = isset($options['transliterate']) ? (bool) $options['transliterate'] : $this->transliterate;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function name($object, PropertyMapping $mapping)
+    public function name($object, PropertyMapping $mapping): string
     {
         if (empty($this->propertyPath)) {
             throw new \LogicException('The property to use can not be determined. Did you call the configure() method?');
@@ -57,11 +55,11 @@ class PropertyNamer implements NamerInterface, ConfigurableInterface
         try {
             $name = $this->getPropertyValue($object, $this->propertyPath);
         } catch (NoSuchPropertyException $e) {
-            throw new NameGenerationException(sprintf('File name could not be generated: property %s does not exist.', $this->propertyPath), $e->getCode(), $e);
+            throw new NameGenerationException(\sprintf('File name could not be generated: property %s does not exist.', $this->propertyPath), $e->getCode(), $e);
         }
 
         if (empty($name)) {
-            throw new NameGenerationException(sprintf('File name could not be generated: property %s is empty.', $this->propertyPath));
+            throw new NameGenerationException(\sprintf('File name could not be generated: property %s is empty.', $this->propertyPath));
         }
 
         if ($this->transliterate) {
@@ -70,7 +68,7 @@ class PropertyNamer implements NamerInterface, ConfigurableInterface
 
         // append the file extension if there is one
         if ($extension = $this->getExtension($file)) {
-            $name = sprintf('%s.%s', $name, $extension);
+            $name = \sprintf('%s.%s', $name, $extension);
         }
 
         return $name;

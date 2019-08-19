@@ -5,7 +5,7 @@ To create a custom file namer, simply implement the `Vich\UploaderBundle\Naming\
 and in the `name` method of your class return the desired file name. Since your entity
 is passed to the `name` method, as well as the mapping describing it, you are
 free to get any information from it to create the name, or inject any other
-services you require.
+service you require.
 
 **Note**:
 
@@ -14,7 +14,7 @@ services you require.
 > depending on what version of PHP you are running.
 
 After you have created your namer and configured it as a service, you simply specify
-the service id for the `namer` configuration option of your mapping. An example:
+the service for the `namer` configuration option of your mapping. An example:
 
 ``` yaml
 vich_uploader:
@@ -22,10 +22,16 @@ vich_uploader:
     mappings:
         product_image:
             upload_destination: product_image
-            namer:              my.namer.product
+            namer: App\Naming\MyNamer
 ```
 
-Where `my.namer.product` is the configured id of the service.
+Where `App\Naming\MyNamer` is the configured service class.
+
+**Note**:
+
+> The namer service must be public.
+> If you're using default configuration, make sure to explicit public visibility
+> for your namer service
 
 
 ## That was it!

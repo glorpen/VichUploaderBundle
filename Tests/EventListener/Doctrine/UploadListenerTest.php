@@ -3,6 +3,7 @@
 namespace Vich\UploaderBundle\Tests\EventListener\Doctrine;
 
 use Vich\UploaderBundle\EventListener\Doctrine\UploadListener;
+use Vich\UploaderBundle\Tests\DummyEntity;
 
 /**
  * Doctrine UploadListener test.
@@ -12,9 +13,9 @@ use Vich\UploaderBundle\EventListener\Doctrine\UploadListener;
 class UploadListenerTest extends ListenerTestCase
 {
     /**
-     * Sets up the test
+     * Sets up the test.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,31 +25,31 @@ class UploadListenerTest extends ListenerTestCase
     /**
      * Test the getSubscribedEvents method.
      */
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = $this->listener->getSubscribedEvents();
 
-        $this->assertSame(array('prePersist', 'preUpdate'), $events);
+        $this->assertSame(['prePersist', 'preUpdate'], $events);
     }
 
     /**
      * Tests the prePersist method.
      */
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $this->metadata
             ->expects($this->once())
             ->method('isUploadable')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity')
-            ->will($this->returnValue(true));
+            ->with(DummyEntity::class)
+            ->willReturn(true);
 
         $this->metadata
             ->expects($this->once())
             ->method('getUploadableFields')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity', self::MAPPING_NAME)
-            ->will($this->returnValue(array(
-                array('propertyName' => 'field_name')
-            )));
+            ->with(DummyEntity::class, self::MAPPING_NAME)
+            ->willReturn([
+                ['propertyName' => 'field_name'],
+            ]);
 
         $this->handler
             ->expects($this->once())
@@ -61,13 +62,13 @@ class UploadListenerTest extends ListenerTestCase
     /**
      * Tests that prePersist skips non-uploadable entity.
      */
-    public function testPrePersistSkipsNonUploadable()
+    public function testPrePersistSkipsNonUploadable(): void
     {
         $this->metadata
             ->expects($this->once())
             ->method('isUploadable')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity')
-            ->will($this->returnValue(false));
+            ->with(DummyEntity::class)
+            ->willReturn(false);
 
         $this->handler
             ->expects($this->never())
@@ -79,7 +80,7 @@ class UploadListenerTest extends ListenerTestCase
     /**
      * Test the preUpdate method.
      */
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $this->adapter
             ->expects($this->once())
@@ -89,16 +90,16 @@ class UploadListenerTest extends ListenerTestCase
         $this->metadata
             ->expects($this->once())
             ->method('isUploadable')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity')
-            ->will($this->returnValue(true));
+            ->with(DummyEntity::class)
+            ->willReturn(true);
 
         $this->metadata
             ->expects($this->once())
             ->method('getUploadableFields')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity', self::MAPPING_NAME)
-            ->will($this->returnValue(array(
-                array('propertyName' => 'field_name')
-            )));
+            ->with(DummyEntity::class, self::MAPPING_NAME)
+            ->willReturn([
+                ['propertyName' => 'field_name'],
+            ]);
 
         $this->handler
             ->expects($this->once())
@@ -111,13 +112,13 @@ class UploadListenerTest extends ListenerTestCase
     /**
      * Test that preUpdate skips non uploadable entity.
      */
-    public function testPreUpdateSkipsNonUploadable()
+    public function testPreUpdateSkipsNonUploadable(): void
     {
         $this->metadata
             ->expects($this->once())
             ->method('isUploadable')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity')
-            ->will($this->returnValue(false));
+            ->with(DummyEntity::class)
+            ->willReturn(false);
 
         $this->adapter
             ->expects($this->never())

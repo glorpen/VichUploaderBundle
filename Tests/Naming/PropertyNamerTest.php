@@ -13,7 +13,7 @@ use Vich\UploaderBundle\Tests\TestCase;
  */
 class PropertyNamerTest extends TestCase
 {
-    public function fileDataProvider()
+    public function fileDataProvider(): array
     {
         $entity = new DummyEntity();
         $entity->someProperty = 'foo';
@@ -21,94 +21,80 @@ class PropertyNamerTest extends TestCase
         $weird_entity = new DummyEntity();
         $weird_entity->someProperty = 'Yéô';
 
-        return array(
-            array('some-file-name.jpeg', 'foo.jpeg',                 $entity,       'someProperty',     false),
-            array('some-file-name',      'foo',                      $entity,       'someProperty',     false),
-            array('some-file-name.jpeg', 'generated-file-name.jpeg', $entity,       'generateFileName', false), // method call
-            array('some-file-name.jpeg', 'Yeo.jpeg',                 $weird_entity, 'someProperty',     true),  // transliteration enabled
-        );
+        return [
+            ['some-file-name.jpeg', 'foo.jpeg',                 $entity,       'someProperty',     false],
+            ['some-file-name',      'foo',                      $entity,       'someProperty',     false],
+            ['some-file-name.jpeg', 'generated-file-name.jpeg', $entity,       'generateFileName', false], // method call
+            ['some-file-name.jpeg', 'yeo.jpeg',                 $weird_entity, 'someProperty',     true],  // transliteration enabled
+        ];
     }
 
     /**
      * @dataProvider fileDataProvider
      */
-    public function testNameReturnsTheRightName($originalFileName, $expectedFileName, $entity, $propertyName, $transliterate)
+    public function testNameReturnsTheRightName($originalFileName, $expectedFileName, $entity, $propertyName, $transliterate): void
     {
         $file = $this->getUploadedFileMock();
         $file
             ->expects($this->any())
             ->method('getClientOriginalName')
-            ->will($this->returnValue($originalFileName));
+            ->willReturn($originalFileName);
 
         $mapping = $this->getPropertyMappingMock();
         $mapping->expects($this->once())
             ->method('getFile')
             ->with($entity)
-            ->will($this->returnValue($file));
+            ->willReturn($file);
 
         $namer = new PropertyNamer();
-        $namer->configure(array('property' => $propertyName, 'transliterate' => $transliterate));
+        $namer->configure(['property' => $propertyName, 'transliterate' => $transliterate]);
 
         $this->assertSame($expectedFileName, $namer->name($entity, $mapping));
     }
 
-    /**
-     * @expectedException Vich\UploaderBundle\Exception\NameGenerationException
-     */
-    public function testNameFailsIfThePropertyDoesNotExist()
+    public function testNameFailsIfThePropertyDoesNotExist(): void
     {
-        $entity  = new DummyEntity();
+        $this->expectException(\Vich\UploaderBundle\Exception\NameGenerationException::class);
+
+        $entity = new DummyEntity();
         $mapping = $this->getPropertyMappingMock();
 
         $namer = new PropertyNamer();
-        $namer->configure(array('property' => 'nonExistentProperty'));
+        $namer->configure(['property' => 'nonExistentProperty']);
 
         $namer->name($entity, $mapping);
     }
 
-    /**
-     * @expectedException Vich\UploaderBundle\Exception\NameGenerationException
-     */
-    public function testNameFailsIfThePropertyIsEmpty()
+    public function testNameFailsIfThePropertyIsEmpty(): void
     {
+        $this->expectException(\Vich\UploaderBundle\Exception\NameGenerationException::class);
+
         $mapping = $this->getPropertyMappingMock();
-        $namer   = new PropertyNamer();
-
-        $namer->configure(array('property' => 'someProperty'));
-
-        $namer->name(new DummyEntity(), $mapping);
-    }
-
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage The property to use can not be determined. Did you call the configure() method?
-     */
-    public function testNamerNeedsToBeConfigured()
-    {
-        $mapping = $this->getPropertyMappingMock();
-        $namer   = new PropertyNamer();
-
-        $namer->name(new DummyEntity(), $mapping);
-    }
-
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage Option "property" is missing or empty.
-     */
-    public function testConfigurationFailsIfThePropertyIsntSpecified()
-    {
         $namer = new PropertyNamer();
 
-        $namer->configure(array('incorrect' => 'options'));
+        $namer->configure(['property' => 'someProperty']);
+
+        $namer->name(new DummyEntity(), $mapping);
     }
 
-    /**
-     * @return \Vich\UploaderBundle\Mapping\PropertyMapping
-     */
-    private function getPropertyMappingMock()
+    public function testNamerNeedsToBeConfigured(): void
     {
-        return $this->getMockBuilder('Vich\UploaderBundle\Mapping\PropertyMapping')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The property to use can not be determined. Did you call the configure() method?');
+
+        $mapping = $this->getPropertyMappingMock();
+        $namer = new PropertyNamer();
+
+        $namer->name(new DummyEntity(), $mapping);
+    }
+
+    public function testConfigurationFailsIfThePropertyIsntSpecified(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Option "property" is missing or empty.');
+
+        $namer = new PropertyNamer();
+
+        $namer->configure(['incorrect' => 'options']);
     }
 }

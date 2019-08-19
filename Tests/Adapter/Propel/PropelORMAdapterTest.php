@@ -2,45 +2,48 @@
 
 namespace Vich\UploaderBundle\Tests\Adapter\Propel;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Vich\UploaderBundle\Adapter\Propel\PropelORMAdapter;
 
 /**
- * PropelORMAdapterTest
+ * PropelORMAdapterTest.
  *
  * @author Kévin Gomez <contact@kevingomez.fr>
  */
-class PropelORMAdapterTest extends \PHPUnit_Framework_TestCase
+class PropelORMAdapterTest extends TestCase
 {
     protected $adapter;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\GenericEvent')) {
+        if (!\class_exists(GenericEvent::class)) {
             self::markTestSkipped('Symfony\Component\EventDispatcher\GenericEvent does not exist.');
         }
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->adapter = new PropelORMAdapter();
     }
 
-    public function testGetObjectFromArgs()
+    public function testGetObjectFromArgs(): void
     {
-        $event = $this->getMock('\Symfony\Component\EventDispatcher\GenericEvent');
+        $event = $this->createMock(GenericEvent::class);
         $event
             ->expects($this->once())
             ->method('getSubject')
-            ->will($this->returnValue(42));
+            ->willReturn(42);
 
         $this->assertSame(42, $this->adapter->getObjectFromArgs($event));
     }
 
-    public function testRecomputeChangeset()
+    public function testRecomputeChangeset(): void
     {
-        $event = $this->getMock('\Symfony\Component\EventDispatcher\GenericEvent');
+        $event = $this->createMock(GenericEvent::class);
 
         // does nothing but should be callable
         $this->adapter->recomputeChangeSet($event);
+        $this->assertTrue(true);    // this workaround is needed to avoid Risky test
     }
 }

@@ -2,7 +2,10 @@
     "name": "vich/uploader-bundle",
     "type": "symfony-bundle",
     "description": "Ease file uploads attached to entities",
-    "keywords": ["file uploads", "upload"],
+    "keywords": [
+        "file uploads",
+        "upload"
+    ],
     "homepage": "https://github.com/dustin10/VichUploaderBundle",
     "license": "MIT",
     "authors": [
@@ -11,53 +14,70 @@
             "email": "ddobervich@gmail.com"
         }
     ],
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.1.x-dev"
-        }
-    },
     "require": {
-        "php": "~5.5|~7.0",
-        "symfony/dependency-injection": "~2.3|~3.0",
-        "symfony/framework-bundle": "~2.3|~3.0",
-        "symfony/finder": "~2.2|~3.0",
-        "symfony/property-access": "~2.5|~3.0",
-        "ocramius/proxy-manager": "~1.0|~2.0",
-        "jms/metadata": "~1.5"
+        "php": "^7.2",
+        "ext-simplexml": "*",
+        "behat/transliterator": "^1.2",
+        "jms/metadata": "^2.0",
+        "symfony/config": "^3.4 || ^4.0",
+        "symfony/dependency-injection": "^3.4 || ^4.0",
+        "symfony/event-dispatcher": "^3.4 || ^4.0",
+        "symfony/form": "^3.4.19 || ^4.0",
+        "symfony/http-foundation": "^3.4 || ^4.0",
+        "symfony/http-kernel": "^3.4 || ^4.0",
+        "symfony/property-access": "^3.4 || ^4.0",
+        "symfony/templating": "^3.4 || ^4.0"
     },
     "require-dev": {
-        "ext-sqlite3" : "*",
-
-        "doctrine/doctrine-bundle": "~1.6",
-        "doctrine/orm": "^2.2.3",
-        "doctrine/mongodb-odm": "~1.0",
-
-        "knplabs/knp-gaufrette-bundle": "~0.3",
-        "oneup/flysystem-bundle": "~1.0",
-
-        "symfony/browser-kit": "~2.3|~3.0",
-        "symfony/css-selector": "~2.3|~3.0",
-        "symfony/dom-crawler": "~2.3|~3.0",
-        "symfony/form": "~2.3|~3.0",
-        "symfony/proxy-manager-bridge": "~2.3|~3.0",
-        "symfony/twig-bridge": "~2.3.10|~3.0",
-        "symfony/twig-bundle": "~2.3|~3.0",
-        "symfony/validator": "~2.3|~3.0",
-        "symfony/yaml": "^2.0.5|~3.0",
-
-        "phpunit/phpunit": "~4.0",
-        "mikey179/vfsStream": "~1.2",
-        "matthiasnoback/symfony-dependency-injection-test": "~0.7"
+        "ext-sqlite3": "*",
+        "alcaeus/mongo-php-adapter": "^1.1",
+        "doctrine/doctrine-bundle": "^1.8",
+        "doctrine/mongodb-odm": "^1.2",
+        "doctrine/orm": "^2.5",
+        "knplabs/knp-gaufrette-bundle": "^0.5",
+        "matthiasnoback/symfony-dependency-injection-test": "^4.0",
+        "mikey179/vfsstream": "^1.6",
+        "oneup/flysystem-bundle": "^3.0",
+        "phpunit/phpunit": "^8.0",
+        "symfony/asset": "^3.4 || ^4.0",
+        "symfony/browser-kit": "^3.4 || ^4.0",
+        "symfony/css-selector": "^3.4 || ^4.0",
+        "symfony/doctrine-bridge": "^3.4 || ^4.0",
+        "symfony/dom-crawler": "^3.4 || ^4.0",
+        "symfony/framework-bundle": "^3.4.23 || ^4.2.4",
+        "symfony/phpunit-bridge": "^4.3",
+        "symfony/security-csrf": "^3.4 || ^4.0",
+        "symfony/translation": "^3.4 || ^4.0",
+        "symfony/twig-bridge": "^3.4 || ^4.0",
+        "symfony/twig-bundle": "^3.4 || ^4.0",
+        "symfony/validator": "^3.4 || ^4.0",
+        "symfony/var-dumper": "^3.4 || ^4.0",
+        "symfony/yaml": "^3.4 || ^4.0"
     },
     "suggest": {
-        "doctrine/orm": "^2.2.3",
-        "doctrine/doctrine-bundle": "~1.6",
-        "doctrine/phpcr-odm": "~1.0",
-        "doctrine/mongodb-odm-bundle": "*",
-        "knplabs/knp-gaufrette-bundle": "~0.3",
-        "glorpen/propel-bundle": ">=1.3.2",
-        "willdurand/propel-eventdispatcher-bundle": "~1.2",
-        "symfony/yaml": "^2.0.5"
+        "doctrine/doctrine-bundle": "For integration with Doctrine",
+        "doctrine/mongodb-odm-bundle": "For integration with Doctrine ODM",
+        "doctrine/orm": "For integration with Doctrine ORM",
+        "doctrine/phpcr-odm": "For integration with Doctrine PHPCR",
+        "knplabs/knp-gaufrette-bundle": "For integration with Gaufrette",
+        "liip/imagine-bundle": "To generate image thumbnails",
+        "ocramius/proxy-manager": "To use lazy services",
+        "oneup/flysystem-bundle": "For integration with Flysystem",
+        "symfony/asset": "To generate better links",
+        "symfony/yaml": "To use YAML mapping",
+        "willdurand/propel-eventdispatcher-bundle": "For integration with Propel",
+        "glorpen/propel-bundle": "For integration with Propel Events"
+    },
+    "config": {
+        "platform": {
+            "ext-mongo": "1.6.16"
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.10.x-dev"
+        }
     },
     "autoload": {
         "psr-4": {

@@ -2,59 +2,62 @@
 
 namespace Vich\UploaderBundle\Tests\Metadata;
 
+use Metadata\AdvancedMetadataFactoryInterface;
+use PHPUnit\Framework\TestCase;
 use Vich\UploaderBundle\Metadata\MetadataReader;
 
-class MetadataReaderTest extends \PHPUnit_Framework_TestCase
+class MetadataReaderTest extends TestCase
 {
     protected $reader;
+
     protected $factory;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->factory = $this->getMock('Metadata\AdvancedMetadataFactoryInterface');
+        $this->factory = $this->createMock(AdvancedMetadataFactoryInterface::class);
         $this->reader = new MetadataReader($this->factory);
     }
 
-    public function testIsUploadable()
+    public function testIsUploadable(): void
     {
         $this->factory
             ->expects($this->once())
             ->method('getMetadataForClass')
             ->with('ClassName')
-            ->will($this->returnValue('something not null'));
+            ->willReturn('something not null');
 
         $this->assertTrue($this->reader->isUploadable('ClassName'));
     }
 
-    public function testIsUploadableWithGivenMapping()
+    public function testIsUploadableWithGivenMapping(): void
     {
-        $fields = array('field' => array('mapping' => 'joe'));
-        $classMetadata = new \stdClass;
+        $fields = ['field' => ['mapping' => 'joe']];
+        $classMetadata = new \stdClass();
         $classMetadata->fields = $fields;
-        $metadata = new \stdClass;
-        $metadata->classMetadata = array('ClassName' => $classMetadata);
+        $metadata = new \stdClass();
+        $metadata->classMetadata = ['ClassName' => $classMetadata];
 
         $this->factory
             ->method('getMetadataForClass')
             ->with('ClassName')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->assertTrue($this->reader->isUploadable('ClassName', 'joe'));
         $this->assertFalse($this->reader->isUploadable('ClassName', 'foo'));
     }
 
-    public function testIsUploadableForNotUploadable()
+    public function testIsUploadableForNotUploadable(): void
     {
         $this->factory
             ->expects($this->once())
             ->method('getMetadataForClass')
             ->with('ClassName')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertFalse($this->reader->isUploadable('ClassName'));
     }
 
-    public function testGetUploadableClassesForwardsCallsToTheFactory()
+    public function testGetUploadableClassesForwardsCallsToTheFactory(): void
     {
         $this->factory
             ->expects($this->once())
@@ -63,68 +66,91 @@ class MetadataReaderTest extends \PHPUnit_Framework_TestCase
         $this->reader->getUploadableClasses();
     }
 
-    public function testGetUploadableFields()
+    public function testGetUploadableFields(): void
     {
-        $fields = array('foo', 'bar', 'baz');
-        $classMetadata = new \stdClass;
+        $fields = [
+            'foo' => ['mapping' => 'foo_mapping'],
+            'bar' => ['mapping' => 'bar_mapping'],
+            'baz' => ['mapping' => 'baz_mapping'],
+        ];
+        $classMetadata = new \stdClass();
         $classMetadata->fields = $fields;
-        $metadata = new \stdClass;
-        $metadata->classMetadata = array('ClassName' => $classMetadata);
+        $metadata = new \stdClass();
+        $metadata->classMetadata = ['ClassName' => $classMetadata];
 
         $this->factory
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getMetadataForClass')
             ->with('ClassName')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->assertSame($fields, $this->reader->getUploadableFields('ClassName'));
+
+        $barFields = ['bar' => ['mapping' => 'bar_mapping']];
+        $this->assertSame($barFields, $this->reader->getUploadableFields('ClassName', 'bar_mapping'));
     }
 
-    public function testGetUploadableFieldsWithInheritance()
+    public function testGetUploadableFieldsWithInheritance(): void
     {
-        $classMetadata = new \stdClass;
-        $classMetadata->fields = array('bar', 'baz');
-        $subClassMetadata = new \stdClass;
-        $subClassMetadata->fields = array('foo');
-        $metadata = new \stdClass;
-        $metadata->classMetadata = array(
-            'ClassName'     => $classMetadata,
-            'SubClassName'  => $subClassMetadata
-        );
+        $classMetadata = new \stdClass();
+        $classMetadata->fields = ['bar', 'baz'];
+        $subClassMetadata = new \stdClass();
+        $subClassMetadata->fields = ['foo'];
+        $metadata = new \stdClass();
+        $metadata->classMetadata = [
+            'ClassName' => $classMetadata,
+            'SubClassName' => $subClassMetadata,
+        ];
 
         $this->factory
             ->expects($this->once())
             ->method('getMetadataForClass')
             ->with('SubClassName')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
-        $this->assertSame(array('bar', 'baz', 'foo'), $this->reader->getUploadableFields('SubClassName'));
+        $this->assertSame(['bar', 'baz', 'foo'], $this->reader->getUploadableFields('SubClassName'));
     }
 
     /**
      * @dataProvider fieldsMetadataProvider
      */
-    public function testGetUploadableField(array $fields, $expectedMetadata)
+    public function testGetUploadableField(array $fields, $expectedMetadata): void
     {
-        $classMetadata = new \stdClass;
+        $classMetadata = new \stdClass();
         $classMetadata->fields = $fields;
-        $metadata = new \stdClass;
-        $metadata->classMetadata = array('ClassName' => $classMetadata);
+        $metadata = new \stdClass();
+        $metadata->classMetadata = ['ClassName' => $classMetadata];
 
         $this->factory
             ->expects($this->once())
             ->method('getMetadataForClass')
             ->with('ClassName')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->assertSame($expectedMetadata, $this->reader->getUploadableField('ClassName', 'field'));
     }
 
-    public function fieldsMetadataProvider()
+    public function testGetUploadableFieldWithInvalidClass(): void
     {
-        return array(
-            array( array('field' => 'toto'), 'toto' ),
-            array( array('lala' => 'toto'), null ),
-        );
+        $this->expectException(\Vich\UploaderBundle\Exception\MappingNotFoundException::class);
+        $this->expectExceptionMessage('Mapping not found. The configuration for the class "InvalidClassName" is probably incorrect.');
+
+        $this->reader->getUploadableFields('InvalidClassName');
+    }
+
+    public function testGetUploadableFieldWithInvalidClassMapping(): void
+    {
+        $this->expectException(\Vich\UploaderBundle\Exception\MappingNotFoundException::class);
+        $this->expectExceptionMessage('Mapping "foo_mapping" does not exist. The configuration for the class "InvalidClassName" is probably incorrect.');
+
+        $this->reader->getUploadableFields('InvalidClassName', 'foo_mapping');
+    }
+
+    public function fieldsMetadataProvider(): array
+    {
+        return [
+            [['field' => 'toto'], 'toto'],
+            [['lala' => 'toto'], null],
+        ];
     }
 }

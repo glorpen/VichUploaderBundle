@@ -52,7 +52,8 @@ Don't worry, it will be quick and easy (I promise!):
 ## Useful resources
 
   * [Configuration reference](configuration_reference.md)
-  * [Events](../../Event/Events.php)
+  * [Events](events.md)
+  * [Console commands](commands.md)
   * [Sandbox](https://github.com/K-Phoen/Vich-Uploader-Sandbox)
   * [Known issues](known_issues.md)
   * [Symfony support policy](symfony_support_policy.md)

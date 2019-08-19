@@ -2,7 +2,9 @@
 
 namespace Vich\UploaderBundle\Tests\EventListener\Doctrine;
 
+use Doctrine\Common\Persistence\Proxy;
 use Vich\UploaderBundle\EventListener\Doctrine\RemoveListener;
+use Vich\UploaderBundle\Tests\DummyEntity;
 
 /**
  * Doctrine RemoveListener test.
@@ -12,9 +14,9 @@ use Vich\UploaderBundle\EventListener\Doctrine\RemoveListener;
 class RemoveListenerTest extends ListenerTestCase
 {
     /**
-     * Sets up the test
+     * Sets up the test.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,14 +26,14 @@ class RemoveListenerTest extends ListenerTestCase
     /**
      * Test the getSubscribedEvents method.
      */
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = $this->listener->getSubscribedEvents();
 
-        $this->assertSame(array('preRemove', 'postRemove'), $events);
+        $this->assertSame(['preRemove', 'postRemove'], $events);
     }
 
-    public function testPreRemove()
+    public function testPreRemove(): void
     {
         $this->object = $this->getEntityProxyMock();
         $this->object
@@ -42,12 +44,12 @@ class RemoveListenerTest extends ListenerTestCase
             ->expects($this->once())
             ->method('isUploadable')
             ->with('VichUploaderEntityProxy')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->listener->preRemove($this->event);
     }
 
-    public function testPreRemoveSkipNonUploadable()
+    public function testPreRemoveSkipNonUploadable(): void
     {
         $this->object = $this->getEntityProxyMock();
         $this->object
@@ -58,7 +60,7 @@ class RemoveListenerTest extends ListenerTestCase
             ->expects($this->once())
             ->method('isUploadable')
             ->with('VichUploaderEntityProxy')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->listener->preRemove($this->event);
     }
@@ -66,21 +68,21 @@ class RemoveListenerTest extends ListenerTestCase
     /**
      * Test the postRemove method.
      */
-    public function testPostRemove()
+    public function testPostRemove(): void
     {
         $this->metadata
             ->expects($this->once())
             ->method('isUploadable')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity')
-            ->will($this->returnValue(true));
+            ->with(DummyEntity::class)
+            ->willReturn(true);
 
         $this->metadata
             ->expects($this->once())
             ->method('getUploadableFields')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity', self::MAPPING_NAME)
-            ->will($this->returnValue(array(
-                array('propertyName' => 'field_name')
-            )));
+            ->with(DummyEntity::class, self::MAPPING_NAME)
+            ->willReturn([
+                ['propertyName' => 'field_name'],
+            ]);
 
         $this->handler
             ->expects($this->once())
@@ -93,13 +95,13 @@ class RemoveListenerTest extends ListenerTestCase
     /**
      * Test that postRemove skips non uploadable entity.
      */
-    public function testPostRemoveSkipsNonUploadable()
+    public function testPostRemoveSkipsNonUploadable(): void
     {
         $this->metadata
             ->expects($this->once())
             ->method('isUploadable')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity')
-            ->will($this->returnValue(false));
+            ->with(DummyEntity::class)
+            ->willReturn(false);
 
         $this->handler
             ->expects($this->never())
@@ -111,11 +113,11 @@ class RemoveListenerTest extends ListenerTestCase
     /**
      * Creates a mock doctrine entity proxy.
      *
-     * @return \Doctrine\Common\Persistence\Proxy
+     * @return Proxy
      */
     protected function getEntityProxyMock()
     {
-        return $this->getMockBuilder('Doctrine\Common\Persistence\Proxy')
+        return $this->getMockBuilder(Proxy::class)
             ->setMockClassName('VichUploaderEntityProxy')
             ->getMock();
     }

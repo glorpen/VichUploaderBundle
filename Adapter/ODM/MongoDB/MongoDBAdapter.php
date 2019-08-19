@@ -12,7 +12,7 @@ use Vich\UploaderBundle\Adapter\AdapterInterface;
 class MongoDBAdapter implements AdapterInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getObjectFromArgs($event)
     {
@@ -20,15 +20,15 @@ class MongoDBAdapter implements AdapterInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function recomputeChangeSet($event)
+    public function recomputeChangeSet($event): void
     {
         $object = $this->getObjectFromArgs($event);
 
         $dm = $event->getDocumentManager();
         $uow = $dm->getUnitOfWork();
-        $metadata = $dm->getClassMetadata(get_class($object));
+        $metadata = $dm->getClassMetadata(\get_class($object));
         $uow->recomputeSingleDocumentChangeSet($metadata, $object);
     }
 }

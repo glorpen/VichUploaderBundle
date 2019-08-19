@@ -1,30 +1,11 @@
-VichImageType
-============
+VichImageType Field
+===================
 
 The bundle provides a custom form type in order to ease the upload, deletion and
 download of images.
 
-In order to use it, just define your field as a `vich_image` as show in the
+In order to use it, just define your field as a `VichImageType` as shown in the
 following example:
-
-```php
-class Form extends AbstractType
-{
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        // ...
-
-        $builder->add('imageFile', 'vich_image', array(
-            'required'      => false,
-            'allow_delete'  => true, // not mandatory, default is true
-            'download_link' => true, // not mandatory, default is true
-        ));
-    }
-}
-```
-
-**Note for Symfony3 users:**
-In case you are using Symfony3, you must use the `VichImageType::class` to specify the field type:
 
 ```php
 // ...
@@ -32,36 +13,154 @@ use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class Form extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // ...
 
-        $builder->add('imageFile', VichImageType::class, array(
-            'required'      => false,
-            'allow_delete'  => true, // not mandatory, default is true
-            'download_link' => true, // not mandatory, default is true
-        ));
+        $builder->add('imageFile', VichImageType::class, [
+            'required' => false,
+            'allow_delete' => true,
+            'download_label' => '...',
+            'download_uri' => true,
+            'image_uri' => true,
+            'imagine_pattern' => '...',
+            'asset_helper' => true,
+        ]);
     }
 }
 ```
 
+allow_delete
+------------
+**type**: `bool` **default**: `true`
 
-For the form type to fully work, you'll also have to use the form theme bundled
-with VichUploaderBundle.
+asset_helper
+------------
+**type**: `bool` **default**: `false`
 
-```yaml
-# app/config/config.yml
-twig:
-    form_themes:
-        # other form themes
-        - 'VichUploaderBundle:Form:fields.html.twig'
+If set to `true`, download uri will be generated with `asset()` method from `symfony/asset` component.
+
+download_uri
+------------
+**type**: `bool`, `string`, `callable` **default**: `true`
+
+If set to `true`, download uri will automatically resolved using storage.
+
+Can be string
+
+```php
+use Vich\UploaderBundle\Form\Type\VichImageType;
+
+$builder->add('genericFile', VichImageType::class, [
+    'download_uri' => $router->generateUrl('acme_download_image', $product->getId()),
+]);
+
 ```
 
-> **N.B:** the `form_themes` parameter is introduced in Symfony 2.5, check 
-[the documentation](http://symfony.com/doc/2.3/cookbook/form/form_customization.html#php) if you use an older version.
+Can be callable
 
-See [Symfony's documentation on form themes](http://symfony.com/doc/current/cookbook/form/form_customization.html#form-theming)
-for more information.
+```php
+use Vich\UploaderBundle\Form\Type\VichImageType;
+
+$builder->add('genericFile', VichImageType::class, [
+    'download_uri' => static function (Product $product) use ($router) {
+        return $router->generateUrl('acme_download_image', $product->getId());
+    },
+]);
+
+```
+
+download_label
+--------------
+**type**: `bool`, `string`, `callable`, `Symfony\Component\PropertyAccess\PropertyPath` **default**: `'download'`
+
+If set to `true`, download label will use original file name.
+
+Can be string 
+```php
+use Vich\UploaderBundle\Form\Type\VichImageType;
+
+$builder->add('genericFile', VichImageType::class, [
+    'download_label' => 'download_file',
+]);
+
+```
+
+Can be callable
+
+```php
+use Vich\UploaderBundle\Form\Type\VichImageType;
+
+$builder->add('genericFile', VichImageType::class, [
+    'download_label' => static function (Product $product) {
+        return $product->getTitle();
+    },
+]);
+
+```
+
+Can be property path 
+```php
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Vich\UploaderBundle\Form\Type\VichImageType;
+
+$builder->add('genericFile', VichImageType::class, [
+    'download_label' => new PropertyPath('title'),
+]);
+
+```
+
+image_uri
+---------
+**type**: `bool`, `string`, `callable` **default**: `true`
+
+If set to `true`, download uri will automatically resolved using storage.
+
+Can be string
+
+```php
+use Vich\UploaderBundle\Form\Type\VichImageType;
+
+$builder->add('genericFile', VichImageType::class, [
+    'image_uri' => 'full uri for image',
+]);
+
+```
+
+Can be callable
+
+```php
+use Vich\UploaderBundle\Form\Type\VichImageType;
+
+$builder->add('genericFile', VichImageType::class, [
+    'image_uri' => static function (Photo $photo, $resolvedUri) use ($cacheManager) {
+        // $cacheManager is LiipImagine cache manager
+        return $cacheManager->getBrowserPath(
+            $resolvedUri,
+            'photo_thumb',
+            ['thumbnail' => ['size' => [$photo->getWidth(), $photo->getHeigth()]]]
+        );
+    },
+]);
+
+```
+
+imagine_pattern
+------------
+**type**: `string` **default**: `null`
+
+If set, image will automatically transformed using [LiipImagineBundle](https://github.com/liip/LiipImagineBundle/).
+
+Example
+
+```php
+use Vich\UploaderBundle\Form\Type\VichImageType;
+
+$builder->add('photo', VichImageType::class, [
+    'imagine_pattern' => 'product_photo_320x240',
+]);
+
+```
 
 ## That was it!
 

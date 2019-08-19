@@ -2,6 +2,7 @@
 
 namespace Vich\UploaderBundle\Tests\Naming;
 
+use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Vich\UploaderBundle\Naming\OrignameNamer;
 use Vich\UploaderBundle\Tests\TestCase;
 
@@ -12,38 +13,38 @@ use Vich\UploaderBundle\Tests\TestCase;
  */
 class OrignameNamerTest extends TestCase
 {
-    public function fileDataProvider()
+    public function fileDataProvider(): array
     {
-        return array(
-            array('file.jpeg', '/[a-z0-9]{13}_file.jpeg/', false),
-            array('file',      '/[a-z0-9]{13}_file/',      false),
-            array('Yéöù.jpeg', '/[a-z0-9]{13}_Yeou.jpeg/', true),
-        );
+        return [
+            ['file.jpeg', '/[a-z0-9]{13}_file.jpeg/', false],
+            ['file',      '/[a-z0-9]{13}_file/',      false],
+            ['Yéöù.jpeg', '/[a-z0-9]{13}_yeou.jpeg/', true],
+        ];
     }
 
     /**
      * @dataProvider fileDataProvider
      */
-    public function testNameReturnsAnUniqueName($name, $pattern, $transliterate)
+    public function testNameReturnsAnUniqueName($name, $pattern, $transliterate): void
     {
         $file = $this->getUploadedFileMock();
         $file
             ->expects($this->any())
             ->method('getClientOriginalName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         $entity = new \DateTime();
 
-        $mapping = $this->getMockBuilder('Vich\UploaderBundle\Mapping\PropertyMapping')
+        $mapping = $this->getMockBuilder(PropertyMapping::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mapping->expects($this->once())
             ->method('getFile')
             ->with($entity)
-            ->will($this->returnValue($file));
+            ->willReturn($file);
 
         $namer = new OrignameNamer();
-        $namer->configure(array('transliterate' => $transliterate));
+        $namer->configure(['transliterate' => $transliterate]);
 
         $this->assertRegExp($pattern, $namer->name($entity, $mapping));
     }

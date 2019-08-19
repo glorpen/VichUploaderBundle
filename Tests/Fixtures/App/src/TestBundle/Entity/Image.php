@@ -32,14 +32,14 @@ class Image
     /**
      * @Vich\UploadableField(mapping="image_mapping", fileNameProperty="imageName")
      *
-     * @var File $imageFile
+     * @var File
      */
     protected $imageFile;
 
     /**
      * @ORM\Column(type="string", nullable=true)
      *
-     * @var string $imageName
+     * @var string
      */
     protected $imageName;
 
@@ -57,7 +57,7 @@ class Image
      *
      * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile $image
      */
-    public function setImageFile(File $image = null)
+    public function setImageFile(File $image = null): void
     {
         $this->imageFile = $image;
 
@@ -77,7 +77,7 @@ class Image
     /**
      * @param string $imageName
      */
-    public function setImageName($imageName)
+    public function setImageName($imageName): void
     {
         $this->imageName = $imageName;
     }
@@ -93,7 +93,7 @@ class Image
     /**
      * @param string $title
      */
-    public function setTitle($title)
+    public function setTitle($title): void
     {
         $this->title = $title;
     }

@@ -13,11 +13,11 @@ trait FileExtensionTrait
      *
      * @return string|null
      */
-    private function getExtension(UploadedFile $file)
+    private function getExtension(UploadedFile $file): ?string
     {
         $originalName = $file->getClientOriginalName();
 
-        if ($extension = pathinfo($originalName, PATHINFO_EXTENSION)) {
+        if ($extension = \pathinfo($originalName, PATHINFO_EXTENSION)) {
             return $extension;
         }
 

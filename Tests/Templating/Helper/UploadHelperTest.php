@@ -2,6 +2,8 @@
 
 namespace Vich\UploaderBundle\Tests\Templating\Helper;
 
+use PHPUnit\Framework\TestCase;
+use Vich\UploaderBundle\Storage\StorageInterface;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 /**
@@ -9,25 +11,26 @@ use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
  *
  * @author Kévin Gomez <contact@kevingomez.fr>
  */
-class UploadHelperTest extends \PHPUnit_Framework_TestCase
+class UploadHelperTest extends TestCase
 {
     protected $storage;
+
     protected $helper;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->storage = $this->getMock('Vich\UploaderBundle\Storage\StorageInterface');
+        $this->storage = $this->createMock(StorageInterface::class);
         $this->helper = new UploaderHelper($this->storage);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertSame('vich_uploader', $this->helper->getName());
     }
 
-    public function testAssetForwardsCallsToTheStorage()
+    public function testAssetForwardsCallsToTheStorage(): void
     {
-        $obj = new \stdClass;
+        $obj = new \stdClass();
 
         $this->storage
             ->expects($this->once())

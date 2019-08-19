@@ -20,33 +20,25 @@ class Product
     /**
      * @ORM\Column(type="datetime")
      *
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $updatedAt;
 
     // ...
 
-    public function setImage(File $image = null)
+    public function setImageFile(?File $imageFile = null): void
     {
-        $this->image = $image;
+        $this->imageFile = $imageFile;
 
         // Only change the updated af if the file is really uploaded to avoid database updates.
         // This is needed when the file should be set when loading the entity.
-        if ($this->image instanceof UploadedFile) {
+        if ($this->imageFile instanceof UploadedFile) {
             $this->updatedAt = new \DateTime('now');
         }
     }
 }
 ```
 See issue [GH-123](https://github.com/dustin10/VichUploaderBundle/issues/123)
-
-## Catchable Fatal Error
-
-When you get the following error:`Catchable Fatal Error: ... must be an instance of Symfony\Component\HttpFoundation\File\UploadedFile, string given, ...`
-you have to define
-`{{ form_enctype(upload_form) }}` in your form.
-
-This is needed for Symfony versions older than 2.3.
 
 ## Annotations don't work with Propel
 
@@ -56,20 +48,20 @@ annotated entities, the only workaround is to define mappings using Yaml or XML.
 
 ## Image not deleted with cascade deletion and Doctrine
 
-Just check the following options: ```cascade={"remove"}``` and ```orphanRemoval=true```.
+Just check the following options: `cascade={"remove"}` and `orphanRemoval=true`.
 
 ```yaml
 Vendor\Bundle\CoolBundle\Entity\CoolEntity:
-    type:   entity
+    type: entity
 
     fields: ...
 
     oneToMany:
         images:
-           targetEntity:   CoolEntityImage
-           mappedBy:       bike
-           cascade:        [persist, merge, remove]
-           orphanRemoval:  true
+           targetEntity: CoolEntityImage
+           mappedBy: bike
+           cascade: [persist, merge, remove]
+           orphanRemoval: true
 ```
 
 ## No Upload is triggered when manually injecting an instance of Symfony\Component\HttpFoundation\File\File
@@ -84,7 +76,7 @@ Consider the following class:
 ``` php
 <?php
 
-namespace Acme\DemoBundle\Entity;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
@@ -101,7 +93,7 @@ class Product
      *
      * @var File
      */
-    private $image;
+    private $imageFile;
 
     /**
      * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
@@ -110,23 +102,23 @@ class Product
      * must be able to accept an instance of 'File' as the bundle will inject one here
      * during Doctrine hydration.
      *
-     * @param File $image
+     * @param File|null $imageFile
      */
-    public function setImage(File $image = null)
+    public function setImageFile(?File $imageFile = null): void
     {
-        $this->image = $image;
+        $this->imageFile = $imageFile;
     }
 }
 ```
 
-If the bundle's configuration parameter `inject_on_load` is set to `true` the `Product::setImage()`
+If the bundle's configuration parameter `inject_on_load` is set to `true` the `Product::setImageFile()`
 method above must take an instance of `File` as when this class is hydrated by Doctrine this
 bundle will automatically inject an instance of `File` there. However if you were to change
 the image path to a new image in that instance of `File` and attempted a `flush()` nothing
 would happen, instead inject a new instance of `UploadedFile` with the new path to your new
 image to sucessfully trigger the upload.
 
-**N.B** : UploadedFile objects have a [*test* mode](http://api.symfony.com/2.3/Symfony/Component/HttpFoundation/File/UploadedFile.html#method___construct) that can be used to simulate file uploads.
+**N.B** : UploadedFile objects have a [*test* mode](http://api.symfony.com/3.4/Symfony/Component/HttpFoundation/File/UploadedFile.html#method___construct) that can be used to simulate file uploads.
 
 ## Failed to set metadata before uploading the file
 

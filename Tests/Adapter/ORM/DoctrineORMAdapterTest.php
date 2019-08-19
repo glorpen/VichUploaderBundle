@@ -2,6 +2,8 @@
 
 namespace Vich\UploaderBundle\Tests\Adapter\ORM;
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
+use PHPUnit\Framework\TestCase;
 use Vich\UploaderBundle\Adapter\ORM\DoctrineORMAdapter;
 use Vich\UploaderBundle\Tests\DummyEntity;
 
@@ -10,11 +12,11 @@ use Vich\UploaderBundle\Tests\DummyEntity;
  *
  * @author Dustin Dobervich <ddobervich@gmail.com>
  */
-class DoctrineORMAdapterTest extends \PHPUnit_Framework_TestCase
+class DoctrineORMAdapterTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
-        if (!class_exists('Doctrine\ORM\Event\LifecycleEventArgs')) {
+        if (!\class_exists(LifecycleEventArgs::class)) {
             self::markTestSkipped('Doctrine\ORM\Event\LifecycleEventArgs does not exist.');
         }
     }
@@ -22,17 +24,17 @@ class DoctrineORMAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * Test the getObjectFromArgs method.
      */
-    public function testGetObjectFromArgs()
+    public function testGetObjectFromArgs(): void
     {
         $entity = new DummyEntity();
 
-        $args = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
+        $args = $this->getMockBuilder(LifecycleEventArgs::class)
             ->disableOriginalConstructor()
             ->getMock();
         $args
             ->expects($this->once())
             ->method('getEntity')
-            ->will($this->returnValue($entity));
+            ->willReturn($entity);
 
         $adapter = new DoctrineORMAdapter();
 

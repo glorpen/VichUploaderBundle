@@ -3,6 +3,7 @@
 namespace Vich\UploaderBundle\Tests\EventListener\Doctrine;
 
 use Vich\UploaderBundle\EventListener\Doctrine\InjectListener;
+use Vich\UploaderBundle\Tests\DummyEntity;
 
 /**
  * Doctrine InjectListener test.
@@ -12,9 +13,9 @@ use Vich\UploaderBundle\EventListener\Doctrine\InjectListener;
 class InjectListenerTest extends ListenerTestCase
 {
     /**
-     * Sets up the test
+     * Sets up the test.
      */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,31 +25,31 @@ class InjectListenerTest extends ListenerTestCase
     /**
      * Test the getSubscribedEvents method.
      */
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = $this->listener->getSubscribedEvents();
 
-        $this->assertSame(array('postLoad'), $events);
+        $this->assertSame(['postLoad'], $events);
     }
 
     /**
      * Test the postLoad method.
      */
-    public function testPostLoad()
+    public function testPostLoad(): void
     {
         $this->metadata
             ->expects($this->once())
             ->method('isUploadable')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity')
-            ->will($this->returnValue(true));
+            ->with(DummyEntity::class)
+            ->willReturn(true);
 
         $this->metadata
             ->expects($this->once())
             ->method('getUploadableFields')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity', self::MAPPING_NAME)
-            ->will($this->returnValue(array(
-                array('propertyName' => 'field_name')
-            )));
+            ->with(DummyEntity::class, self::MAPPING_NAME)
+            ->willReturn([
+                ['propertyName' => 'field_name'],
+            ]);
 
         $this->handler
             ->expects($this->once())
@@ -61,13 +62,13 @@ class InjectListenerTest extends ListenerTestCase
     /**
      * Test that postLoad skips non uploadable entity.
      */
-    public function testPostLoadSkipsNonUploadable()
+    public function testPostLoadSkipsNonUploadable(): void
     {
         $this->metadata
             ->expects($this->once())
             ->method('isUploadable')
-            ->with('Vich\UploaderBundle\Tests\DummyEntity')
-            ->will($this->returnValue(false));
+            ->with(DummyEntity::class)
+            ->willReturn(false);
 
         $this->handler
             ->expects($this->never())

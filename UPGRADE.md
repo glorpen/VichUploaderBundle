@@ -1,10 +1,35 @@
-Upgrading from v0.13.0 to master
+Upgrading from v1.6.0 to 1.8.0
+==============================
+
+- we enforced, via type-hinting, as many parameters and return values as we can.
+  This is _formally_ a BC break, but likely you don't need to change anything in
+  your code. Anyway, if you implemented an interface or extended a bundle class
+  with your custom class, you need to check to be consistent with such type hinting.
+
+Upgrading from v1.0.0 to 1.6.0
+==============================
+
+- the transliteration is now using `behat\transliterator` instead of a custom one. Some minor
+differences are that dash is not preserved anymore and names are lowercased.
+- the form option `download_link` now is deprecated, use `download_uri` instead.
+- **BC-BREAK** in order to fixing [#704](https://github.com/dustin10/VichUploaderBundle/issues/704) for xml and yaml
+  mapping you should prepend relative from bundle sub-namespace to each mapping file.
+  For example for `Entity\Product` mapping file would be renamed from `Product.xml` to `Entity.Product.xml`,
+  for `Document\Article`: `Article.yml` -> `Document.Article.yml`.
+
+
+Upgrading from v0.14.0 to v1.0.0
 ================================
 
-Nothing!
+No BC breaks.
+
+Upgrading from v0.13.0 to v0.14.0
+=================================
+
+No BC breaks.
 
 Upgrading from v0.12.0 to v0.13.0
-================================
+=================================
 
 - the `resolvePath` and `resolveUri` Storage methods now take a field name
   instead of a mapping name. The same goes for the UploaderExtension and
@@ -14,7 +39,7 @@ Upgrading from v0.12.0 to v0.13.0
   inferred from the field's name.
 
 Upgrading from v0.11.0 to v0.12.0
-================================
+=================================
 
 - the `storage` configuration paramater changed. It accepts the name of the
   storage engine to use (file_system, gaufrette or flysystem).
@@ -38,7 +63,7 @@ Upgrading from v0.9.0 to v0.10.0
   UploaderHelper `asset` method.
 
 Upgrading from v0.5.0 to 0.6.0
-===============================
+==============================
 
 - `getUriPrefix` default value is now /uploads
 

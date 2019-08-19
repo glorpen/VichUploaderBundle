@@ -4,11 +4,10 @@ namespace Vich\UploaderBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Vich\UploaderBundle\Exception\MappingNotFoundException;
 
 /**
- * Register the uploadable models in BazingaPropelEventDispatcherBundle
+ * Register the uploadable models in BazingaPropelEventDispatcherBundle.
  *
  * @author Kévin Gomez <contact@kevingomez.fr>
  */
@@ -27,26 +26,32 @@ class RegisterPropelModelsPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('vich_uploader.mappings')) {
             return;
         }
 
         $mappings = $container->getParameter('vich_uploader.mappings');
+        $hasPropelMapping = false;
 
-        if ($this->isDriverUsed('propel', $mappings)) {
-            $this->registerBazingaEvents($mappings, $container);
+        foreach ($mappings as $mapping) {
+            if ('propel' === $mapping['db_driver']) {
+                $hasPropelMapping = true;
+
+                break;
+            }
         }
-    }
 
-    protected function registerBazingaEvents(array $mappings, ContainerBuilder $container)
-    {
-        $metadata = $container->get('vich_uploader.metadata_reader');
+        if (!$hasPropelMapping) {
+            return;
+        }
 
-        $serviceTypes = array(
+        $serviceTypes = [
             'inject', 'clean', 'remove', 'upload',
-        );
+        ];
+
+        $metadata = $container->get('vich_uploader.metadata_reader');
 
         foreach ($metadata->getUploadableClasses() as $class) {
             foreach ($metadata->getUploadableFields($class) as $field) {
@@ -56,19 +61,19 @@ class RegisterPropelModelsPass implements CompilerPassInterface
 
                 $mapping = $mappings[$field['mapping']];
 
-                if ($mapping['db_driver'] !== 'propel') {
+                if ('propel' !== $mapping['db_driver']) {
                     continue;
                 }
 
                 foreach ($serviceTypes as $type) {
-                    if (!$container->has(sprintf('vich_uploader.listener.%s.%s', $type, $field['mapping']))) {
+                    if (!$container->has(\sprintf('vich_uploader.listener.%s.%s', $type, $field['mapping']))) {
                         continue;
                     }
 
-                    $definition = $container->getDefinition(sprintf('vich_uploader.listener.%s.%s', $type, $field['mapping']));
+                    $definition = $container->getDefinition(\sprintf('vich_uploader.listener.%s.%s', $type, $field['mapping']));
                     $definition->setClass($container->getDefinition($definition->getParent())->getClass());
                     $definition->setPublic(true);
-                    $definition->addTag('propel.event_subscriber', array('class' => $class));
+                    $definition->addTag('propel.event_subscriber', ['class' => $class]);
                 }
             }
         }
