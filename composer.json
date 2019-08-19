@@ -1,21 +1,26 @@
 {
     "name": "vich/uploader-bundle",
     "type": "symfony-bundle",
-    "description": "Ease file uploads attached to entities",
+    "description": "Ease file uploads attached to entities with legacy Propel ORM",
     "keywords": [
         "file uploads",
-        "upload"
+        "upload",
+        "propel"
     ],
-    "homepage": "https://github.com/dustin10/VichUploaderBundle",
+    "homepage": "https://github.com/glorpen/VichUploaderBundle",
     "license": "MIT",
     "authors": [
         {
             "name": "Dustin Dobervich",
             "email": "ddobervich@gmail.com"
+        },
+        {
+            "name": "Arkadiusz Dzięgiel",
+            "email": "arkadiusz.dziegiel@glorpen.pl"
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.0",
         "ext-simplexml": "*",
         "behat/transliterator": "^1.2",
         "jms/metadata": "^2.0",
